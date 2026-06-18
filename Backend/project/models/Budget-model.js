@@ -1,12 +1,17 @@
 const mongoose = require("mongoose");
 
+
 const budgetSchema = new mongoose.Schema({
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref :"login",
+        required:true
+    },
     month:{
         type:String,
         enum:{
             values:['jan','feb','mar','apr','may','june','july',
-                'aug','sep','oct','nov','dec'
-            ]
+                'aug','sep','oct','nov','dec']
         },
         required:true
     },
@@ -14,13 +19,7 @@ const budgetSchema = new mongoose.Schema({
    budget:{
     type:Number,
     required: true,
-    },
-
-    spent:{
-    type:Number,
-    required: true,
-    },
-
+    }
 },
 {
     timestamps:true
