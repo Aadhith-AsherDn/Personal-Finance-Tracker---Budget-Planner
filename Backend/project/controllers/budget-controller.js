@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const budget = require("../models/Budget-model.js");
+const budgetmodel = require("../models/Budget-model.js");
 
 const setbudget = asyncHandler(async (req,res)=>{
     const {
@@ -18,8 +18,8 @@ const setbudget = asyncHandler(async (req,res)=>{
         })
     }
 
-    const newBudget = await budget.create({
-        userId:req.userid,
+    const newBudget = await budgetmodel.create({
+        userId:req.user.id,
         budget,
         month
     });
@@ -27,30 +27,36 @@ const setbudget = asyncHandler(async (req,res)=>{
     return res.status(200).json(newBudget);
 });
 
-const modbudget = asyncHandler(async (req,res)=>{
-   const updateMonth = await budget.findOne({
-    userId: req.user.id,
-    month: req.params.month
-    });
 
-    if(!updateMonth){
-        return res.status(400).json({msg:"you didn't created budget for this month"});
-    }
-    
-    const newBudget = await budget.findOneAndUpdate(
-    updateMonth,
-    req.body,
+const modbudget = asyncHandler(async (req, res) => {
+
+    const updatedBudget = await budgetmodel.findOneAndUpdate(
+        {
+            userId: req.user.id,
+            month: req.params.month
+        },
+        req.body,
+        {
+            new: true,
+            runValidators: true
+        }
     );
 
+    if (!updatedBudget) {
+        return res.status(404).json({
+            msg: "Budget not found for this month"
+        });
+    }
+
     return res.status(200).json({
-        msg:"budget updated successfully",
-        budget: updatedbudget
+        msg: "Budget updated successfully",
+        budget: updatedBudget
     });
-     
 });
 
+
 const deleteBudget = asyncHandler(async (req,res)=>{
-    const delMonth = await budget.findOne({
+    const delMonth = await budgetmodel.findOne({
     userId: req.user.id,
     month: req.params.month
     });
@@ -67,9 +73,16 @@ const deleteBudget = asyncHandler(async (req,res)=>{
 
 const getBudget = asyncHandler(async (req,res)=>{
 
-    const budgets = await budget.find({
+    const budgets = await budgetmodel.find({
         userId: req.user.id
     });
 
     return res.status(200).json(budgets);
 });
+
+module.exports = {
+    setbudget,
+    modbudget,
+    deleteBudget,
+    getBudget
+};

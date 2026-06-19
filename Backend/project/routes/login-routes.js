@@ -7,6 +7,7 @@ const {register,userLogin,profile} = require("../controllers/user-control.js");
 
 
 
+
 router.post("/register",register);
 router.post("/login",userLogin);
 router.get("/profile",validateToken,profile);
